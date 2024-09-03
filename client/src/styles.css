@@ -92,15 +92,16 @@ form.create-note button {
   position: absolute;
   right: 18px;
   bottom: -18px;
-  background: #ffc422;
+  background: #f5ba13;
   color: #fff;
   border: none;
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  box-shadow: 0 1px 3px rgba(190, 137, 22, 0.3);
+  box-shadow: 0 1px 3px rgba(255, 248, 233, 0.3);
   cursor: pointer;
   outline: none;
+  
 }
 
 /* To-do style */

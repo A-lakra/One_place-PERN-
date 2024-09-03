@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
@@ -6,39 +6,71 @@ import CreateArea from "./CreateArea";
 import ToDo from "./ToDo";
 import ToDoItem from "./ToDoItem";
 import InputArea from "./InputArea";
+import { fetchNotes, addNote as addNoteToBackend, deleteNote as deleteNoteFromBackend } from '../api';
 
 function App() {
   const [notes, setNotes] = useState([]);
 
-  function addNote(newNote) {
-    setNotes((prevNotes) => {
-      return [...prevNotes, newNote];
-    });
+  // function addNote(newNote) {
+  //   setNotes((prevNotes) => {
+  //     return [...prevNotes, newNote];
+  //   });
+  // }
+
+  useEffect(() => {
+    const getNotes = async () => {
+      try {
+        const notesFromServer = await fetchNotes();
+        setNotes(notesFromServer);
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+      }
+    };
+  
+    getNotes();
+  }, []);
+  
+
+
+  async function addNote(newNote) {
+    try {
+      const addedNote = await addNoteToBackend(newNote);
+      setNotes((prevNotes) => [...prevNotes, addedNote]);
+    } catch (error) {
+      console.error('Error adding note:', error);
+    }
   }
 
-  function deleteNote(id) {
-    setNotes((prevNotes) => {
-      return prevNotes.filter((noteItem, index) => {
-        return index !== id;
-      });
-    });
+  
+  
+  async function deleteNoteAndFetch(id) {
+    try {
+      await deleteNoteFromBackend(id);
+      const updatedNotes = await fetchNotes();
+      setNotes(updatedNotes);
+    } catch (error) {
+      alert('Failed to delete note: ' + error.message);
+      console.error('Error deleting note:', error);
+    }
   }
+  
+  
+  
 
   return (
     <div>
       <Header />
       <CreateArea onAdd={addNote} />
-      {notes.map((noteItem, index) => {
-        return (
-          <Note
-            key={index}
-            id={index}
-            title={noteItem.title}
-            content={noteItem.content}
-            onDelete={deleteNote}
-          />
-        );
-      })}
+      {notes.map((noteItem) => (
+  <Note
+    key={noteItem.id}
+    id={noteItem.id}
+    title={noteItem.title}
+    content={noteItem.content}
+    onDelete={deleteNoteAndFetch}
+  />
+))}
+
 
       <ToDo />
       <Footer />
